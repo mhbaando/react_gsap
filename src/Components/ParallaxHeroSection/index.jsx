@@ -8,7 +8,6 @@ const StyledSVGWrapper = styled.div`
   width: 50vw;
   height: 30vh;
   position: relative;
-  border: 1px solid red;
 `;
 
 function ParallaxHero() {
