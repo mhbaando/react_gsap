@@ -1,11 +1,11 @@
-import { useRef, useEfect } from "react";
+import { useRef, useEffect } from "react";
 import styled from "styled-components";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 // 1. we need to register the plugin
-gsap.registerPlugin(ScrollTrigger);
 // 2. target the element you want to animate by using useRef & useEffect
+gsap.registerPlugin(ScrollTrigger);
 
 const StyledRevealContainer = styled.section`
   position: relative;
@@ -94,21 +94,55 @@ const CrossReveal = ({
   authorName,
 }) => {
   // animate by container one way
-  const containerRef = useRef(null);
+  const containerRef = useRef();
   // animate the image the opposite way at the same time
-  const imageRef = useRef(null);
+  const imageRef = useRef();
   // specify the poin our animation start
-  const trigerRef = useRef(null);
+  const trigerRef = useRef();
   // to target the person conariner
-  const personRef = useRef(null);
+  const personRef = useRef();
   // to target the qoue container
-  const qouteref = useRef(null);
+  const qouteref = useRef();
 
   // in order to avoide targeting null elements
+  useEffect(() => {
+    // define timeline
+    const crossRevealTween = gsap.timeline({
+      defaults: { ease: "none" }, // no ease animation
+      scrollTrigger: {
+        // we set the trigger element that specift the point, we want our animation to start
+        trigger: trigerRef.current,
+        // we need to set the stop position when the middle trigger eleme is the middle of the view port
+        start: "center center",
+        end: () => "+=" + trigerRef.current?.offsetWidth,
+        scrub: true,
+        pin: true,
+        anticipatePin: 1,
+        markers: true,
+      },
+    });
+
+    // animate the container one way
+    crossRevealTween
+      .fromTo(
+        // element we want to animate // and what we will aimate
+        containerRef.current,
+        { xPercent: 100, x: 0 },
+        { xPercent: 0 }
+      )
+      // animate the image the opposite way at the same time
+      // ,0 means animate this line to the same time of the above line
+      .fromTo(imageRef.current, { xPercent: -100, x: 0 }, { xPercent: 0 }, 0)
+      // fadeIn the name and the job
+      .fromTo(personRef.current, { autoAlpha: 0 }, 0)
+      // FadeIn the qoute
+      .fromTo(qouteref.current, { autoAlpha: 0, delay: 0.26 }, 0);
+  }, []);
+
   return (
-    <StyledRevealContainer>
+    <StyledRevealContainer ref={trigerRef}>
       {/* This div is triger ref */}
-      <div className="crossRevealImage" ref={trigerRef}>
+      <div className="crossRevealImage">
         <img src={face} alt="" />
         <div className="person__content" ref={personRef}>
           <h3 className="person_Name">{name}</h3>
